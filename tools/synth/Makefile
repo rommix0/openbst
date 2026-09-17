@@ -1,3 +1,11 @@
+# make's built-in default is the name "cc", which does not exist as a binary
+# on some toolchains (MinGW ships only gcc). Only override it when nothing
+# more specific set CC, so `make CC=clang` and a CC from the environment
+# still win.
+ifeq ($(origin CC),default)
+CC := gcc
+endif
+
 CFLAGS ?= -O2 -g -Wall -Wextra -std=gnu11 -I../../include
 BUILD  := ../../build
 SRC    := ../../src
