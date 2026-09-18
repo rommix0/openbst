@@ -105,8 +105,10 @@ typedef struct {
     /* An unvoiced frame carries no pitch fraction at all, not even the
        coefficient parity the others fold into that byte. */
     uint8_t  unvoiced_no_frac;
-    /* The highest pitch level a build's accent codes reach. French tops
-       out four above the middle where the others climb ten. */
+    /* The level a word takes when its every stress mark has been used, as a
+       height above the middle. Five unless a build holds it lower, which the
+       1998 French module does at four. It is not a ceiling on every code: the
+       level a phrase reaches is higher than this and is not cut down to it. */
     uint8_t  level_max;
     uint8_t  long_silence_f0;
     uint8_t  exc_two_way;
@@ -215,6 +217,10 @@ typedef struct {
     uint8_t  num_scale_kind;   /* 1 = the Italian plural thousand and its lone one */
     uint8_t  num_hundred_and;  /* a hundreds word joins what follows with "and" */
     uint8_t  num_liaison;      /* the marker a lone tens word is said behind */
+    /* A four digit number that is not a round thousand is read as a count of
+       hundreds, the hundred word kept in front of whatever follows it,
+       rather than as a count of thousands. */
+    uint8_t  num_four_as_hundreds;
     /* What the two lower "not this one" marks do, which the builds do not
        agree on: 0 the English way, 1 Russian, 2 the Romance and Greek and
        Hebrew way, 3 Japanese, 4 Arabic, 5 Dutch and German. */
@@ -536,8 +542,19 @@ typedef struct {
 /* Set to print each stage's working as it runs -- the stream as assembled,
    after the rule pass and at the pair scan, the transition records, the vowel
    durations and the gain smoother's inputs. What a build is compared against
-   the engine on when its frames stop agreeing. */
+   the engine on when its frames stop agreeing.
+
+   It is a variable so a driver can turn it on part way through a run, which
+   also means the calls reach the linker in every ordinary build and drag
+   vfprintf in behind them. BST_NO_TRACE makes it a constant instead, so the
+   blocks fold away and nothing in the library names stdio at all. */
+#ifdef BST_NO_TRACE
+enum { bst_trace = 0 };
+#define bst_tracef(...) ((void)0)
+#else
 extern int bst_trace;
+#define bst_tracef(...) fprintf(stderr, __VA_ARGS__)
+#endif
 
 /* Returns a pointer to `need` bytes at a virtual address, or NULL. */
 const uint8_t *bst_at(const bst_image *img, uint32_t va, size_t need);

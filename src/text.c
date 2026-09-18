@@ -6,7 +6,9 @@
 /* The tables are read from the image the caller supplies; nothing here is a
    copy of the original's data. */
 
+#ifndef BST_NO_TRACE
 int bst_trace = 0;
+#endif
 
 /* The 1995 build's table directory. Every address here was found by reading
    the original's code; nothing is inferred from another build. */
@@ -343,6 +345,12 @@ const bst_tabmap BST_MAP_1998_FRN = {
     .near_ptrs    = 1,
     .unvoiced_no_frac = 1,
     .level_max      = 4,
+    .num_kind          = 4,
+    .num_group_kind    = 3,
+    .num_two_kind      = 3,
+    .num_scale_kind    = 3,
+    .num_liaison       = 0x59,
+    .num_four_as_hundreds = 1,
     .inton_mode     = 3,
     .long_silence_chunk = 1,
     .long_silence_f0 = 0xD1,
@@ -423,7 +431,7 @@ const bst_tabmap BST_MAP_1998_FRN = {
         [BST_S_ORD_TIETH] = 0x000a2178,
         [BST_S_PLURAL] = 0x000a2174,
         [BST_S_POINT] = 0x000a2138,
-        [BST_S_SCALES] = 0x000a1f00,
+        [BST_S_SCALES] = 0x000a1f1a,
         [BST_S_TEENS] = 0x000a1e18,
         [BST_S_TENS] = 0x000a1db6,
         [BST_S_ZERO] = 0x000a1e0c,
@@ -1213,7 +1221,6 @@ const bst_tabmap BST_MAP_2006_DUT = {
         0x85, 0xE1, 0x83, 0xE3, 0x84, 0xE5, 0xE6, 0xE7, 0x8A, 0x82, 0x88, 0x89, 0xEC, 0xED, 0x8C, 0x8B,
         0xF0, 0xF1, 0xF2, 0xF3, 0x93, 0xF5, 0x94, 0xF7, 0xF8, 0xF9, 0xFA, 0x96, 0x81, 0xFD, 0xFE, 0xFF,
     },
-    .vdur_kind     = 1,
     .trn_whole     = 1,
     .pair_class = {
         0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 7, 7, 7, 7,
@@ -2544,7 +2551,6 @@ const bst_tabmap BST_MAP_2006_POL = {
         [0x5E] = 0x20,
     },
 
-    .vdur_kind     = 1,
     .trn_whole     = 1,
     .pair_class = {
         0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1,
@@ -3077,7 +3083,6 @@ const bst_tabmap BST_MAP_2006_RUS = {
     .slope_mult        = 167,
     .inton_dur_mult    = 887,
     .inton_slope_shift = 1,
-    .stress_shift      = 5,
     .voice_stride      = 4,
     .trn_round         = 1,
     .ph_single_n       = 84,

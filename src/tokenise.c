@@ -224,6 +224,10 @@ static void punct_out(bst_tok *t, int c) {
     t->sentence = !closes(b);
     if (b == '.' || b == '?' || b == '!' || b == ',' || b == ';') t->lastend = b;
     if (t->literal) return;
+    /* A tilde is a lead-in rather than a symbol: it and the character after
+       it are one mark, and neither is said by name. Speak now closes the
+       phrase where it stands, which is what the bar does as punctuation. */
+    if (b == 0x7E && c == 0x7C) { rd(t); emit(t, 0x7C); return; }
     if (b == ':' && is_digit(t, t->prevch) && is_digit(t, c)) { emit(t, ','); return; }
     if (b == ',' && t->img->t.comma_ends_text) {
         /* The build stops here: nothing after the comma reaches the machine.
@@ -942,7 +946,7 @@ void bst_tok_init(bst_tok *t, const bst_image *img, const char *text) {
     t->img = img;
     if (img->t.xlat_kind && bst_translit(img, text, t->xbuf, sizeof t->xbuf) >= 0) {
         text = t->xbuf;
-        if (bst_trace) fprintf(stderr, "xlat '%s'\n", t->xbuf);
+        if (bst_trace) bst_tracef("xlat '%s'\n", t->xbuf);
     }
     t->text = (const uint8_t *)text;
     t->tn = (int)strlen(text);

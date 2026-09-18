@@ -211,13 +211,20 @@ static int accents_french(const bst_image *img, uint8_t *s, int len,
     w--;
 
     if (last != 0 && !seen && latest == 0 && (type == 0x11 || type == 0x17)) {
+        /* A word whose every stress mark has been used takes the level below
+           the one a phrase reaches. The 1998 module holds that level lower
+           than the 2006 one does, and the cap belongs here rather than on
+           every lookup: the level a phrase carries is higher still and must
+           not be pulled down with it. */
+        int own = 0x3D + (img->t.level_max ? img->t.level_max : 5);
+        if (own > 0x42) own = 0x42;
         if (n - last + 1 > 4) {
             if (kind == 2) { if (type == 0x11) { type = 0x16; code = 0x44; } }
-            else if (w == wmark) code = 0x42;
+            else if (w == wmark) code = own;
         } else if (kind == 2) {
             last = 0;
         } else if (w == wmark) {
-            code = 0x42;
+            code = own;
         }
     }
 
@@ -313,8 +320,8 @@ static int accents_french(const bst_image *img, uint8_t *s, int len,
     if (slot) s[slot] = (uint8_t)slotcode;
 
     if (bst_trace)
-        fprintf(stderr, "acc n=%d last=%d latest=%d w=%d/%d code=%02x type=%02x"
-                        " dx=%d cx=%d out=%02x\n",
+        bst_tracef("acc n=%d last=%d latest=%d w=%d/%d code=%02x type=%02x"
+                   " dx=%d cx=%d out=%02x\n",
                 n, last, latest, w, wmark, code, type, dx, cx, out);
 
     if (st->tail >= 0 && st->tail < len && s[st->tail] == 0)
@@ -470,8 +477,8 @@ static int accents_japanese(const bst_image *img, uint8_t *s, int len,
     }
 
     if (bst_trace)
-        fprintf(stderr, "acc n=%d first=%d l14=%d l24=%d shape=%02x type=%02x"
-                        " hi=%02x lo=%02x out=%02x\n",
+        bst_tracef("acc n=%d first=%d l14=%d l24=%d shape=%02x type=%02x"
+                   " hi=%02x lo=%02x out=%02x\n",
                 n, first, l14, l24, shape, type, hi, lo, out);
 
     if (st->tail >= 0 && st->tail < len && s[st->tail] == 0)
@@ -648,8 +655,8 @@ int bst_accents(const bst_image *img, uint8_t *s, int len, bst_accent_state *st)
     }
 
     if (bst_trace)
-        fprintf(stderr, "acc n=%d first=%d last=%d kind=%d nextkind=%d emph=%d"
-                        " shape=%02x type=%02x level=%d lead=%02x codeA=%02x\n",
+        bst_tracef("acc n=%d first=%d last=%d kind=%d nextkind=%d emph=%d"
+                   " shape=%02x type=%02x level=%d lead=%02x codeA=%02x\n",
                 n, first, last, kind, nextkind, emph, shape, type, st->level,
                 lead, codeA);
 
